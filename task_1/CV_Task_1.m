@@ -21,13 +21,46 @@ ground3 = imread(ground3Path);
 imagesArray = {image1, image2, image3};
 groundTruthArray = {ground1, ground2, ground3};
 
+SE = strel('disk', 3);
+
+count = 1;
+
 for i = 1:size(imagesArray, 2)
     currentImage = imagesArray{i};
-    figure;
     
     currentImage = currentImage(:,:,3);
-    currentImage = imbinarize(currentImage);
+    currentImage = imbinarize(currentImage, 0.5);
     
+    currentImage = ~currentImage;
+    
+    currentImage = imerode(currentImage, SE);
+
+    
+    currentImage = bwareafilt(currentImage, 1);
+    
+    currentImage = imfill(currentImage, 'holes');
+    
+    disp(groundIndex);
+    
+    subplot(3, 3, count);
     imshow(currentImage);
+    title("Segmented");
+    count = count + 1;
+    
+    subplot(3, 3, count);
+    imshow(imagesArray{i});
+    title("Original");
+    count = count + 1;
+    
+    subplot(3, 3, count);
+    imshow(groundTruthArray{i});
+     title("Ground Truth");
+    count = count + 1;
+    
+    currentImageDouble = im2double(currentImage);
+    currentGround = im2double(groundTruthArray{i});
+    diceScore = dice(currentImageDouble, currentGround);
+    disp(diceScore);
+
 end
 
