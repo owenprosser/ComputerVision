@@ -40,8 +40,6 @@ for i = 1:size(imagesArray, 2)
     
     currentImage = imfill(currentImage, 'holes');
     
-    disp(groundIndex);
-    
     subplot(3, 3, count);
     imshow(currentImage);
     title("Segmented");
