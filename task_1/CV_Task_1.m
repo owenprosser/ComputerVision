@@ -35,7 +35,6 @@ for i = 1:size(imagesArray, 2)
     
     currentImage = imerode(currentImage, SE);
 
-    
     currentImage = bwareafilt(currentImage, 1);
     
     currentImage = imfill(currentImage, 'holes');
@@ -61,4 +60,3 @@ for i = 1:size(imagesArray, 2)
     disp(diceScore);
 
 end
-
