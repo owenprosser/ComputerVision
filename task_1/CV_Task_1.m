@@ -1,4 +1,4 @@
-close all; clc;
+clear; close all; clc;
 
 currentPath = mfilename('fullpath');
 currentPath = erase(currentPath, 'CV_Task_1');
@@ -39,9 +39,15 @@ for i = 1:size(imagesArray, 2)
     
     currentImage = imfill(currentImage, 'holes');
     
+    currentImageDouble = im2double(currentImage);
+    currentGround = im2double(groundTruthArray{i});
+    diceScore = dice(currentImageDouble, currentGround);
+    disp(diceScore);
+    
     subplot(3, 3, count);
+    sgtitle('Simple Segmentation')
     imshow(currentImage);
-    title("Segmented");
+    title("Segmented: " + diceScore);
     count = count + 1;
     
     subplot(3, 3, count);
@@ -53,10 +59,40 @@ for i = 1:size(imagesArray, 2)
     imshow(groundTruthArray{i});
      title("Ground Truth");
     count = count + 1;
-    
-    currentImageDouble = im2double(currentImage);
-    currentGround = im2double(groundTruthArray{i});
-    diceScore = dice(currentImageDouble, currentGround);
-    disp(diceScore);
-
 end
+
+i = 3;
+currentImage = imagesArray{i};
+currentImage = rgb2gray(currentImage);
+se = strel('disk',3);
+currentImage = imsubtract(imadd(currentImage,imbothat(currentImage,se)),imtophat(currentImage,se));
+[L,Centers] = imsegkmeans(currentImage,3);
+currentImage = labeloverlay(currentImage,L);
+figure;
+imshow(currentImage);
+figure;
+
+lab_he = rgb2lab(imagesArray{i});
+ab = lab_he(:,:,2:3);
+ab = im2single(ab);
+nColors = 3;
+% repeat the clustering 3 times to avoid local minima
+pixel_labels = imsegkmeans(ab,nColors,'NumAttempts',3);
+imshow(pixel_labels,[])
+title('Image Labeled by Cluster Index');
+mask1 = pixel_labels==1;
+cluster1 = imagesArray{i} .* uint8(mask1);
+imshow(cluster1)
+title('Objects in Cluster 1');
+
+mask2 = pixel_labels==2;
+cluster2 = imagesArray{i} .* uint8(mask2);
+figure;
+imshow(cluster2)
+title('Objects in Cluster 2');
+
+mask3 = pixel_labels==3;
+cluster3 = imagesArray{i} .* uint8(mask3);
+figure;
+imshow(cluster3)
+title('Objects in Cluster 3');
