@@ -43,3 +43,20 @@ figure;
 imshow(planet_texture);
 figure;
 imshow(asteroid_texture);
+
+F = fft2(planet_texture);
+S = abs(F);
+%get the centered spectrum
+Fsh = fftshift(F);
+%apply log transform
+S2 = log(1+abs(Fsh));
+figure;imshow(S2,[]);title('log transformed - Planet')
+
+F = fft2(asteroid_texture);
+S = abs(F);
+%get the centered spectrum
+Fsh = fftshift(F);
+%apply log transform
+S2 = log(1+abs(Fsh));
+figure;imshow(S2,[]);title('log transformed - Asteroid')
+disp('hello')
