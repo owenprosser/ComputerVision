@@ -18,7 +18,6 @@ planet = bsxfun(@times, original_image, cast(planet_mask, 'like', original_image
 
 asteroid = rgb2gray(asteroid);
 planet = rgb2gray(planet);
-
 figure;
 imshow(original_image);
 figure;
@@ -44,19 +43,25 @@ imshow(planet_texture);
 figure;
 imshow(asteroid_texture);
 
-F = fft2(planet_texture);
-S = abs(F);
-%get the centered spectrum
-Fsh = fftshift(F);
-%apply log transform
-S2 = log(1+abs(Fsh));
-figure;imshow(S2,[]);title('log transformed - Planet')
+% Prepare image
+f = planet_texture;
+imshow(f);
+% Compute Fourier Transform
+F = fft2(f,256,256);
+figure;
+imshow(F);
+F = fftshift(F); % Center FFT
+figure;
+imshow(F);
+% Measure the minimum and maximum value of the transform amplitude
+min(min(abs(F)));
+max(max(abs(F)));
+figure;
+imshow(abs(F),[0 1000]); colormap(jet); colorbar
+figure;
+imshow(log(1+abs(F)),[0,10]); colormap(jet); colorbar
+% Look at the phases
+figure;
+imshow(angle(F),[-pi,pi]); colormap(jet); colorbar
 
-F = fft2(asteroid_texture);
-S = abs(F);
-%get the centered spectrum
-Fsh = fftshift(F);
-%apply log transform
-S2 = log(1+abs(Fsh));
-figure;imshow(S2,[]);title('log transformed - Asteroid')
-disp('hello')
+x = input(" ");

@@ -38,24 +38,24 @@ for i = 1:size(imagesArray, 2)
     currentImage = bwareafilt(currentImage, 1);
     
     currentImage = imfill(currentImage, 'holes');
-    
+
     currentImageDouble = im2double(currentImage);
     currentGround = im2double(groundTruthArray{i});
     diceScore = dice(currentImageDouble, currentGround);
     averageDICE = averageDICE + diceScore;
     disp(diceScore);
-    
+
     subplot(3, 3, count);
     sgtitle('Simple Segmentation')
     imshow(currentImage);
     title("Segmented: " + diceScore);
     count = count + 1;
-    
+
     subplot(3, 3, count);
     imshow(imagesArray{i});
     title("Original");
     count = count + 1;
-    
+
     subplot(3, 3, count);
     imshow(groundTruthArray{i});
      title("Ground Truth");
@@ -67,7 +67,7 @@ count = 1;
 averageDICE = 0;
 for i = 1:size(imagesArray, 2)
     currentImage = imagesArray{i};
-    
+
     lab_he = rgb2lab(currentImage);
     lab_he = imsubtract(imadd(lab_he,imbothat(lab_he,SE)),imtophat(lab_he,SE));
     ab = lab_he(:,:,2:3);
@@ -77,7 +77,7 @@ for i = 1:size(imagesArray, 2)
     pixel_labels = imsegkmeans(ab,nColors,'NumAttempts',3);
     mask2 = pixel_labels==2;
     currentImage = currentImage .* uint8(mask2);
-    
+
     cform = makecform('srgb2lab');
     lab = applycform(currentImage, cform);
     currentImage = lab;
@@ -86,27 +86,28 @@ for i = 1:size(imagesArray, 2)
     currentImage = imfill(currentImage, 'holes');
     currentImage = bwareafilt(currentImage, 1);
     currentImage = imdilate(currentImage, SE);
-    
+
     currentImageDouble = im2double(currentImage);
     currentGround = im2double(groundTruthArray{i});
     diceScore = dice(currentImageDouble, currentGround);
     averageDICE = averageDICE + diceScore;
     disp(diceScore);
-    
+
     subplot(3, 3, count);
     sgtitle('Bottom-hat filtering and K-means segmentation')
     imshow(currentImage);
     title("Segmented: " + diceScore);
     count = count + 1;
-    
+
     subplot(3, 3, count);
     imshow(imagesArray{i});
     title("Original");
     count = count + 1;
-    
+
     subplot(3, 3, count);
     imshow(groundTruthArray{i});
     title("Ground Truth");
     count = count + 1;
 end
 disp("Average DICE: "+averageDICE/3);
+x = input(" ");
