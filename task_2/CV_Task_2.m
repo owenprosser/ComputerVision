@@ -13,13 +13,33 @@ planet_mask = logical(image-asteroid_mask);
 planet_mask = bwareafilt(planet_mask, 1);
 planet_mask = imfill(planet_mask, 'holes');
 
-asteroid_texture = bsxfun(@times, original_image, cast(asteroid_mask, 'like', original_image));
-planet_texture = bsxfun(@times, original_image, cast(planet_mask, 'like', original_image));
+asteroid = bsxfun(@times, original_image, cast(asteroid_mask, 'like', original_image));
+planet = bsxfun(@times, original_image, cast(planet_mask, 'like', original_image));
+
+asteroid = rgb2gray(asteroid);
+planet = rgb2gray(planet);
 
 figure;
 imshow(original_image);
 figure;
-imshow(asteroid_texture);
+imshow(asteroid);
+figure;
+imshow(planet);
+
+binaryImage = imbinarize(asteroid);
+[r, c] = find(binaryImage == 1);
+asteroid_coordinates = [round(mean(r)), round(mean(c))];
+binaryImage = imbinarize(planet);
+[r, c] = find(binaryImage == 1);
+planet_coordinates = [round(mean(r)), round(mean(c))];
+
+size = 100;
+asteroid_crop = [asteroid_coordinates(1)-size asteroid_coordinates(2)+size/2 size size];
+asteroid_texture = imcrop(asteroid,asteroid_crop);
+
+planet_crop = [planet_coordinates(2) planet_coordinates(1)-20 size size];
+planet_texture = imcrop(planet, planet_crop);
 figure;
 imshow(planet_texture);
-
+figure;
+imshow(asteroid_texture);
