@@ -5,7 +5,7 @@ b = csvread('b.csv');
 x1 = csvread('x.csv');
 y1 = csvread('y.csv');
 
-z = [a,b];
+z = [a;b];
 
 dt = 0.05;     % time interval
 N = length(z);  % number of samples
@@ -41,47 +41,27 @@ plot(x1,y1,'xb');
 hold;
 plot(px,py,'+r');
 
-disp('Root Mean Squared Error:');
 mean_error = 0;
 error_array = zeros(100);
-for i = 1:length(a)
-    disp(a(i));
-    disp(px(i));
-    disp("-");
+y_mean_error = 0;
 
-    if a(i) > px(i)
-        error = (a(i)-px(i));
-        mean_error = mean_error + error;
-        error_array(i) = error;
-    elseif a(i) < px(i)
-        error = (px(i)-a(i));
-        mean_error = mean_error + error;
-        error_array(i) = error;
-    elseif b(i) < py(i)
-        error = (px(i)-a(i));
-        mean_error = mean_error + error;
-        error_array(i) = error;
-    elseif b(i) > py(i)
-        error = (px(i)-a(i));
-        mean_error = mean_error + error;
-        error_array(i) = error;
-    end
+for i = 1:length(a)
+    x_error = (x1(i)-px(i))*(x1(i)-px(i));
+    y_error = (py(i)-y1(i))*(py(i)-y1(i));
+    error_array(i) = sqrt(x_error + y_error);
+    y_mean_error = y_mean_error + y_error;
+    mean_error = mean_error + x_error + y_error;
 end
 
+disp("Mean Error:")
 disp(mean_error/100);
 std_dev = std2(error_array);
+disp("Standard Deviation:")
 disp(std_dev);
-
-mean_error = 0;
-for i = 1:length(a)
-    error = sqrt((a(i)-px(i))*(a(i)-px(i)));
-    error_array(i) = error;
-    mean_error = mean_error + error;
-end
-
-disp(mean_error/100);
-std_dev = std2(error_array);
-disp(std_dev);
+error_rms = rms(error_array);
+error_rms = error_rms(1);
+disp('Root Mean Squared Error:');
+disp(error_rms);
 
 x = input(" ");
 function [xe, Pe] = kalmanUpdate(x, P, H, R, z)

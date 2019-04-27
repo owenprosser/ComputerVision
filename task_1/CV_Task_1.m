@@ -21,22 +21,17 @@ ground3 = imread(ground3Path);
 imagesArray = {image1, image2, image3};
 groundTruthArray = {ground1, ground2, ground3};
 
-SE = strel('disk', 3);
+SE = strel('disk', 2);
 
 count = 1;
 averageDICE = 0;
 for i = 1:size(imagesArray, 2)
     currentImage = imagesArray{i};
-    
-    currentImage = currentImage(:,:,3);
-    currentImage = imbinarize(currentImage, 0.5);
-    
-    currentImage = ~currentImage;
-    
-    currentImage = imerode(currentImage, SE);
 
+    currentImage = currentImage(:,:,3);
+    currentImage = ~imbinarize(currentImage, 0.5);
+    currentImage = imerode(currentImage, SE);
     currentImage = bwareafilt(currentImage, 1);
-    
     currentImage = imfill(currentImage, 'holes');
 
     currentImageDouble = im2double(currentImage);
@@ -65,24 +60,27 @@ disp("Average DICE: "+averageDICE/3);
 figure;
 count = 1;
 averageDICE = 0;
+SE = strel('disk', 5);
 for i = 1:size(imagesArray, 2)
     currentImage = imagesArray{i};
+    currentImage = uint8((currentImage-min(currentImage(:)))/(max(currentImage(:))-min(currentImage(:)))*255);
+    original = currentImage(:,:,3);
+    tophatFiltered = imbothat(original,SE);
+    mask = imbinarize(tophatFiltered, 0.07);
+    mask = imdilate(mask, SE);
+    image = original - tophatFiltered;
+    image = regionfill(image, mask);
 
-    lab_he = rgb2lab(currentImage);
-    lab_he = imsubtract(imadd(lab_he,imbothat(lab_he,SE)),imtophat(lab_he,SE));
-    ab = lab_he(:,:,2:3);
-    ab = im2single(ab);
     nColors = 3;
     % repeat the clustering 3 times to avoid local minima
-    pixel_labels = imsegkmeans(ab,nColors,'NumAttempts',3);
-    mask2 = pixel_labels==2;
-    currentImage = currentImage .* uint8(mask2);
+    pixel_labels = imsegkmeans(image,nColors,'NumAttempts',3);
+    mask2 = pixel_labels==1;
+    B = labeloverlay(imagesArray{i},pixel_labels);
+    currentImage = image .* uint8(mask2);
 
-    cform = makecform('srgb2lab');
-    lab = applycform(currentImage, cform);
-    currentImage = lab;
-    currentImage = rgb2gray(currentImage);
     currentImage = imbinarize(currentImage);
+    currentImage = ~currentImage;
+
     currentImage = imfill(currentImage, 'holes');
     currentImage = bwareafilt(currentImage, 1);
     currentImage = imdilate(currentImage, SE);
@@ -110,4 +108,5 @@ for i = 1:size(imagesArray, 2)
     count = count + 1;
 end
 disp("Average DICE: "+averageDICE/3);
-x = input(" ");
+
+%x = input("exit");
