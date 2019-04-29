@@ -65,17 +65,16 @@ for i = 1:size(imagesArray, 2)
     currentImage = imagesArray{i};
     currentImage = uint8((currentImage-min(currentImage(:)))/(max(currentImage(:))-min(currentImage(:)))*255);
     original = currentImage(:,:,3);
-    tophatFiltered = imbothat(original,SE);
-    mask = imbinarize(tophatFiltered, 0.07);
+    bothatFiltered = imbothat(original,SE);
+    mask = imbinarize(bothatFiltered, 0.07);
     mask = imdilate(mask, SE);
-    image = original - tophatFiltered;
+    image = original - bothatFiltered;
     image = regionfill(image, mask);
 
-    nColors = 3;
+    nColors = 5;
     % repeat the clustering 3 times to avoid local minima
     pixel_labels = imsegkmeans(image,nColors,'NumAttempts',3);
     mask2 = pixel_labels==1;
-    B = labeloverlay(imagesArray{i},pixel_labels);
     currentImage = image .* uint8(mask2);
 
     currentImage = imbinarize(currentImage);
@@ -108,5 +107,5 @@ for i = 1:size(imagesArray, 2)
     count = count + 1;
 end
 disp("Average DICE: "+averageDICE/3);
-
+%figure; imshow(outputImage);
 %x = input("exit");

@@ -64,4 +64,4 @@ imshow(log(1+abs(F)),[0,10]); colormap(jet); colorbar
 figure;
 imshow(angle(F),[-pi,pi]); colormap(jet); colorbar
 
-x = input(" ");
+%x = input(" ");
