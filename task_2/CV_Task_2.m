@@ -32,36 +32,61 @@ binaryImage = imbinarize(planet);
 [r, c] = find(binaryImage == 1);
 planet_coordinates = [round(mean(r)), round(mean(c))];
 
-size = 100;
-asteroid_crop = [asteroid_coordinates(1)-size asteroid_coordinates(2)+size/2 size size];
+image_size = 100;
+asteroid_crop = [asteroid_coordinates(1)-image_size asteroid_coordinates(2)+image_size/2 image_size image_size];
 asteroid_texture = imcrop(asteroid,asteroid_crop);
 
-planet_crop = [planet_coordinates(2) planet_coordinates(1)-20 size size];
+planet_crop = [planet_coordinates(2) planet_coordinates(1)-20 image_size image_size];
 planet_texture = imcrop(planet, planet_crop);
 figure;
 imshow(planet_texture);
 figure;
 imshow(asteroid_texture);
 
-% Prepare image
-f = planet_texture;
-imshow(f);
-% Compute Fourier Transform
-F = fft2(f,256,256);
-figure;
-imshow(F);
-F = fftshift(F); % Center FFT
-figure;
-imshow(F);
-% Measure the minimum and maximum value of the transform amplitude
-min(min(abs(F)));
-max(max(abs(F)));
-figure;
-imshow(abs(F),[0 1000]); colormap(jet); colorbar
-figure;
-imshow(log(1+abs(F)),[0,10]); colormap(jet); colorbar
-% Look at the phases
-figure;
-imshow(angle(F),[-pi,pi]); colormap(jet); colorbar
+planet_texture_1 = imcrop(planet_texture, [50, 50, 49, 49]);
+planet_texture_2 = imcrop(planet_texture, [50, 1, 49, 49]);
+
+asteroid_texture_1 = imcrop(asteroid_texture, [1, 50, 49, 49]);
+asteroid_texture_2 = imcrop(asteroid_texture, [50, 50, 49, 49]);
+
+images_array = {planet_texture_1, planet_texture_2, asteroid_texture_1, asteroid_texture_2};
+
+results = zeros(3,4);
+last_image = zeros(50);
+
+for i=1:4
+    Im = images_array{i};
+    for j=1:3
+        radi = j*5;
+        imageSize = size(Im);
+        disp(imageSize);
+        ci = [25, 25, radi];     % center and radius of circle ([c_row, c_col, r])
+        [xx,yy] = ndgrid((1:imageSize(1))-ci(1),(1:imageSize(2))-ci(2));
+        mask = uint8((xx.^2 + yy.^2)<ci(3)^2);
+        croppedImage = uint8(zeros(size(Im)));
+        croppedImage(:,:,1) = Im(:,:,1).*mask;               
+        results(j, i) = sum(croppedImage(:)) - sum(last_image(:));
+
+        last_image = croppedImage;
+    end
+    last_image = zeros(50);
+end
+
+% for i=1:4
+%     for j=1:3
+%         results(j,i) = j;
+%     end
+% end
+
+% % Prepare image
+% f = planet_texture;
+% imshow(f);
+% % Compute Fourier Transform
+% F = fft2(f,256,256);
+% figure;
+% imshow(F);
+% F = fftshift(F); % Center FFT
+% figure;
+% imshow(F);
 
 %x = input(" ");
