@@ -44,7 +44,7 @@ figure;
 imshow(asteroid_texture);
 
 planet_texture_1 = imcrop(planet_texture, [50, 50, 49, 49]);
-planet_texture_2 = imcrop(planet_texture, [50, 1, 49, 49]);
+planet_texture_2 = imcrop(planet_texture, [50, 1, 49, 49]); 
 
 asteroid_texture_1 = imcrop(asteroid_texture, [1, 50, 49, 49]);
 asteroid_texture_2 = imcrop(asteroid_texture, [50, 50, 49, 49]);
@@ -59,7 +59,6 @@ for i=1:4
     for j=1:3
         radi = j*5;
         imageSize = size(Im);
-        disp(imageSize);
         ci = [25, 25, radi];     % center and radius of circle ([c_row, c_col, r])
         [xx,yy] = ndgrid((1:imageSize(1))-ci(1),(1:imageSize(2))-ci(2));
         mask = uint8((xx.^2 + yy.^2)<ci(3)^2);
@@ -72,21 +71,19 @@ for i=1:4
     last_image = zeros(50);
 end
 
-% for i=1:4
-%     for j=1:3
-%         results(j,i) = j;
-%     end
-% end
+fohist(planet_texture_1);
+fohist(planet_texture_2);
 
-% % Prepare image
-% f = planet_texture;
-% imshow(f);
-% % Compute Fourier Transform
-% F = fft2(f,256,256);
-% figure;
-% imshow(F);
-% F = fftshift(F); % Center FFT
-% figure;
-% imshow(F);
+fohist(asteroid_texture_1);
+fohist(asteroid_texture_2);
+
+imhist(planet_texture_1);
+
+function fohist(img)
+    [counts, binCenters] = imhist(img);
+    P = counts/sum(counts);
+    meanValue = sum(counts .* binCenters) / sum(counts);
+    disp(meanValue);
+end
 
 %x = input(" ");

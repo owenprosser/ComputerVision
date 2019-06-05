@@ -61,14 +61,14 @@ for i = 1:length(a)
     noisy_mean_error = noisy_error_array(i) + noisy_mean_error;
 end
 
-disp("Predicted - Mean Error:")
+disp("Estimated - Mean Error:")
 disp(predicted_mean_error/100);
 std_dev = std2(predicted_error_array);
-disp("Predicted - Standard Deviation:")
+disp("Estimated - Standard Deviation:")
 disp(std_dev);
 predicted_error_rms = rms(predicted_error_array);
 predicted_error_rms = predicted_error_rms(1);
-disp('Predicted - Root Mean Squared Error:');
+disp('Estimated - Root Mean Squared Error:');
 disp(predicted_error_rms);
 
 disp("Noisy - Mean Error:")

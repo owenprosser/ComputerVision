@@ -70,6 +70,7 @@ for i = 1:size(imagesArray, 2)
     mask = imdilate(mask, SE);
     image = original - bothatFiltered;
     image = regionfill(image, mask);
+    outputImage = image;
 
     nColors = 5;
     % repeat the clustering 3 times to avoid local minima
@@ -107,5 +108,5 @@ for i = 1:size(imagesArray, 2)
     count = count + 1;
 end
 disp("Average DICE: "+averageDICE/3);
-%figure; imshow(outputImage);
+figure; imshow(outputImage);
 %x = input("exit");
